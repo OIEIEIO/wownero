@@ -134,6 +134,7 @@ namespace cryptonote {
     if (length <= 1) {
       return 1;
     }
+    if (length > 1 && length < 10) { return 1007; }
     static_assert(DIFFICULTY_WINDOW >= 2, "Window is too small");
     assert(length <= DIFFICULTY_WINDOW);
     sort(timestamps.begin(), timestamps.end());
@@ -170,8 +171,8 @@ namespace cryptonote {
   
     const int64_t T = static_cast<int64_t>(target_seconds);
     size_t N = DIFFICULTY_WINDOW_V2;
-    if (timestamps.size() < 4) { 
-      return 1; 
+    if (timestamps.size() < 20) { 
+      return 1008; 
     } else if ( timestamps.size() < N+1 ) { 
       N = timestamps.size() - 1;
     } else {  
@@ -205,6 +206,7 @@ namespace cryptonote {
     int64_t  T = DIFFICULTY_TARGET_V2;
     int64_t  N = DIFFICULTY_WINDOW_V2;
     int64_t  L(0), ST, sum_3_ST(0), next_D, prev_D;
+    if (timestamps.size() < 30) { return 1009; }
     assert(timestamps.size() == cumulative_difficulties.size() && timestamps.size() <= static_cast<uint64_t>(N+1) );
     for ( int64_t i = 1; i <= N; i++ ) {  
       ST = static_cast<int64_t>(timestamps[i]) - static_cast<int64_t>(timestamps[i-1]);
@@ -230,7 +232,7 @@ namespace cryptonote {
     uint64_t  N = DIFFICULTY_WINDOW_V2;
     uint64_t  L(0), ST(0), next_D, prev_D, avg_D, i;
     assert(timestamps.size() == cumulative_difficulties.size() && timestamps.size() <= N+1 );
-    if ( height <= 63469 + 1 ) { return 100000069; }
+    if ( height < 40 ) { return 1010; }
     std::vector<uint64_t>TS(N+1);
     TS[0] = timestamps[0];
     for ( i = 1; i <= N; i++) {
