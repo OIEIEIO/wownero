@@ -829,8 +829,14 @@ difficulty_type Blockchain::get_difficulty_for_next_block()
   top_hash = get_tail_id(); // get it again now that we have the lock
 
   uint8_t version = get_current_hard_fork_version();
-  uint64_t difficulty_blocks_count = version >= 8 ? DIFFICULTY_BLOCKS_COUNT_V2 : DIFFICULTY_BLOCKS_COUNT;
-  
+  uint64_t difficulty_blocks_count = DIFFICULTY_BLOCKS_COUNT;
+  if (version >= 11) {
+    difficulty_blocks_count = DIFFICULTY_BLOCKS_COUNT_V3;
+  } else if (version <= 10 && version >= 8) {
+    difficulty_blocks_count = DIFFICULTY_BLOCKS_COUNT_V2;
+  } else {
+    difficulty_blocks_count = DIFFICULTY_BLOCKS_COUNT;
+  }
   // ND: Speedup
   // 1. Keep a list of the last 735 (or less) blocks that is used to compute difficulty,
   //    then when the next block difficulty is queried, push the latest height data and
@@ -1067,8 +1073,14 @@ difficulty_type Blockchain::get_next_difficulty_for_alternative_chain(const std:
 
   uint8_t version = get_current_hard_fork_version();
   size_t height = m_db->height();
-  size_t difficulty_blocks_count = version >= 8 ? DIFFICULTY_BLOCKS_COUNT_V2 : DIFFICULTY_BLOCKS_COUNT;
-
+  size_t difficulty_blocks_count = DIFFICULTY_BLOCKS_COUNT;
+  if (version >= 11) {
+    difficulty_blocks_count = DIFFICULTY_BLOCKS_COUNT_V3;
+  } else if (version <= 10 && version >= 8) {
+    difficulty_blocks_count = DIFFICULTY_BLOCKS_COUNT_V2;
+  } else {
+    difficulty_blocks_count = DIFFICULTY_BLOCKS_COUNT;
+  }
   // if the alt chain isn't long enough to calculate the difficulty target
   // based on its blocks alone, need to get more blocks from the main chain
   if(alt_chain.size()< difficulty_blocks_count)
