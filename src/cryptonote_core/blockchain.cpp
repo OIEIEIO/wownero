@@ -881,13 +881,16 @@ difficulty_type Blockchain::get_difficulty_for_next_block()
     m_difficulties = difficulties;
   }
   size_t target = get_difficulty_target();
-  uint64_t H = m_db->height();
   uint64_t T = DIFFICULTY_TARGET_V2;
   uint64_t N = DIFFICULTY_WINDOW_V3;
+  uint64_t HEIGHT = m_db->height();
+  uint64_t FORK_HEIGHT = DIFFICULTY_FORK_HEIGHT;
+  uint64_t difficulty_guess = DIFFICULTY_RESET;
+
   difficulty_type diff = next_difficulty(timestamps, difficulties, target);
 
   if (version >= 11) {
-    diff = next_difficulty_v5(timestamps, difficulties, H, T, N);
+    diff = next_difficulty_v5(timestamps, difficulties, T, N, HEIGHT, FORK_HEIGHT, difficulty_guess);
   } else if (version == 10) {
     diff = next_difficulty_v4(timestamps, difficulties, height);
   } else if (version == 9) {
@@ -1133,13 +1136,15 @@ difficulty_type Blockchain::get_next_difficulty_for_alternative_chain(const std:
 
   // FIXME: This will fail if fork activation heights are subject to voting
   size_t target = get_ideal_hard_fork_version(bei.height) < 2 ? DIFFICULTY_TARGET_V1 : DIFFICULTY_TARGET_V2;
-  uint64_t H = m_db->height();
   uint64_t T = DIFFICULTY_TARGET_V2;
   uint64_t N = DIFFICULTY_WINDOW_V3;
+  uint64_t HEIGHT = m_db->height();
+  uint64_t FORK_HEIGHT = DIFFICULTY_FORK_HEIGHT;
+  uint64_t difficulty_guess = DIFFICULTY_RESET;
 
   // calculate the difficulty target for the block and return it
   if (version >= 11) {
-    return next_difficulty_v5(timestamps, cumulative_difficulties, H, T, N);
+    return next_difficulty_v5(timestamps, cumulative_difficulties, T, N, HEIGHT, FORK_HEIGHT, difficulty_guess);
   } else if (version == 10) {
     return next_difficulty_v4(timestamps, cumulative_difficulties, height);
   } else if (version == 9) {
